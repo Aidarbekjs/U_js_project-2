@@ -215,4 +215,60 @@ const modalTrigger = document.querySelectorAll('[data-modal]'),
 
     ).render();
 
+      //forms
+
+      const forms = document.querySelectorAll('form');
+
+      const message = {
+        loading: 'Загрузка...',
+        success: 'Спасибо!Скоро мы с вами свяжемся',
+        failure:'Что-то пошло не так...'
+
+      };
+
+      forms.forEach(items => {
+        postData(items);
+      });
+
+      function postData(form) {
+        form.addEventListener('submit', (e) => {
+          e.preventDefault();
+
+          let statusMessage = document.createElement('div');
+          statusMessage.classList.add('status');
+          statusMessage.textContent = message.loading;
+          form.appendChild(statusMessage);
+
+          const xhr = new XMLHttpRequest();
+          xhr.open('POST', 'server.php');
+          xhr.setRequestHeader('Content-type', 'application/json; charset = utf-8');
+           const formData = new FormData(form);
+
+           const object = {};
+           formData.forEach(function(value, key) {
+             object[key] = value;
+           });
+
+           const json = JSON.stringify(object);
+
+           xhr.send(json);
+
+           xhr.addEventListener('load', () => {
+             if (xhr.status === 200) {
+               console.log(xhr.response);
+               statusMessage.textContent = message.success;
+               form.reset();
+               setTimeout(() => {
+                 statusMessage.remove();
+               }, 2000);
+             } else {
+               statusMessage.textContent = message.failure;
+             }
+           });
+          
+        });
+      }
+
+
+
 });
