@@ -242,32 +242,35 @@ const modalTrigger = document.querySelectorAll('[data-modal]'),
           `;
           form.insertAdjacentElement('afterend', statusMessage);
           
-          const xhr = new XMLHttpRequest();
-          xhr.open('POST', 'server.php');
-          xhr.setRequestHeader('Content-type', 'application/json; charset = utf-8');
-           const formData = new FormData(form);
+          
+          const formData = new FormData(form);
 
            const object = {};
            formData.forEach(function(value, key) {
              object[key] = value;
            });
 
-           const json = JSON.stringify(object);
+          //  const json = JSON.stringify(object);
 
-           xhr.send(json);
-
-           xhr.addEventListener('load', () => {
-             if (xhr.status === 200) {
-               console.log(xhr.response);
-               showThanksModal(message.success);
-               form.reset();
-                statusMessage.remove();
-                form.reset();
-              
-             } else {
-               showThanksModal(message.failure);
-             }
+           fetch('server.php', {
+             method: 'POST',
+             headers: {
+              'Content-Type': 'application/json'
+          },
+            body: JSON.stringify(object)
+           }).then(data => data.text())
+           .then(data => {
+            console.log(data);
+            showThanksModal(message.success);
+            statusMessage.remove();
+            
+           }).catch(() => {
+            showThanksModal(message.failure);
+           }).finally(() => {
+            form.reset();
            });
+
+          
           
         });
       }
